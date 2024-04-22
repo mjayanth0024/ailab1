@@ -105,170 +105,220 @@ print("performance measure:",c)
       `
     },
     {
-      question: "Aim: To find the Spearman’s correlation coefficient for the given data",
+      question: "Aim:8 PUZZLE BFS",
       code: `
-  import pandas as pd
-  import numpy as np
-  from collections import Counter
+ from collections import deque
+
+# Class to represent the state of the puzzle
+class PuzzleState:
+    def __init__(self, puzzle, moves=0):
+        self.puzzle = puzzle
+        self.moves = moves
+
+    def __eq__(self, other):
+        return self.puzzle == other.puzzle
+
+    def __hash__(self):
+        return hash(str(self.puzzle))
+
+    def __str__(self):
+        return '\n'.join([' '.join(map(str, row)) for row in self.puzzle])
+
+    def get_blank_position(self):
+        for i in range(3):
+            for j in range(3):
+                if self.puzzle[i][j] == 0:
+                    return i, j
+
+    def get_neighbors(self):
+        moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Possible movements: right, down, left, up
+        i, j = self.get_blank_position()
+        neighbors = []
+        for move in moves:
+            new_i, new_j = i + move[0], j + move[1]
+            if 0 <= new_i < 3 and 0 <= new_j < 3:
+                new_puzzle = [row[:] for row in self.puzzle]
+                new_puzzle[i][j], new_puzzle[new_i][new_j] = new_puzzle[new_i][new_j], new_puzzle[i][j]
+                neighbors.append(PuzzleState(new_puzzle, self.moves + 1))
+        return neighbors
+
+# Breadth-First Search
+def bfs(initial_state, goal_state):
+    visited = set()
+    queue = deque([initial_state])
+
+    while queue:
+        current_state = queue.popleft()
+        if current_state == goal_state:
+             return current_state.moves, current_state
+
+        visited.add(current_state)
+        for neighbor in current_state.get_neighbors():
+            if neighbor not in visited:
+                queue.append(neighbor)
+
+    return float('inf'), None
+
+
+initial_puzzle = [        [1, 2, 3],[8, 0, 4],[7, 6, 5]]
+goal_puzzle = [
+    [2, 8, 3],
+    [1, 6, 4],
+    [7, 0, 5]
+]
   
-  def modified_di(x, y):
-      d1 = Counter(x)
-      cf = 0
-      d2 = Counter(y)
-      for i in d1:
-          if (d1[i] > 1):
-              cf += d1[i] * (d1[i] * d1[i] - 1) / 12
-      for i in d2:
-          if (d2[i] > 1):
-              cf += d2[i] * (d2[i] * d2[i] - 1) / 12
-      return cf
-  
-  x = np.array(list(map(float, input("Enter X values: ").split())))
-  y = np.array(list(map(float, input("Enter Y values: ").split())))
-  n = len(x)
-  df = pd.DataFrame(x)
-  a = df.rank()
-  rx = a[0].to_numpy()
-  df2 = pd.DataFrame(y)
-  a2 = df2.rank()
-  ry = a2[0].to_numpy()
-  D = rx - ry
-  di2 = sum(D * D) + modified_di(x, y)
-  res = pd.DataFrame({"X": x, "Y": y, "Rₓ": rx, "Rᵧ": ry, "D": D, "D²": D * D})
-  res = res.to_string(index=False)
-  print(res)
-  cc = 1 - (6 * di2 / (n * (n * n - 1)))
-  print("Spearman's Correlation Coefficient =", round(cc, 4))
+"""initial_puzzle = [
+        [1, 0, 2],
+        [4, 5, 3],
+        [7, 8, 6]
+    ]
+  goal_puzzle = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 0]
+    ]"""
+
+initial_state = PuzzleState(initial_puzzle)
+goal_state = PuzzleState(goal_puzzle)
+moves, solution_state = bfs(initial_state, goal_state)
+if solution_state:
+    print("Solution found in {} moves:".format(moves))
+    print(solution_state)
+else:
+    print("No solution found.")
       `
     },
     {
-      question: "Aim: To write a Python program to classify the data based on One-way ANOVA.",
+      question: "Aim: GREEDY BFS",
       code: `
-  import pandas as pd
-  import scipy.stats as se
-  
-  n = int(input("Enter no. of treatments: "))
-  l = []
-  N = 0
-  for i in range(n):
-      l.append(list(map(int, input("Enter treatment(s): ").split())))
-  G = S = RSS = 0
-  alpha = float(input("Enter Level of Significance: "))
-  for i in l:
-      G += sum(i)
-      S += sum(i) * sum(i) / len(i)
-  
-  for i in l:
-      for j in i:
-          RSS += j * j
-          N += 1
-  
-  CF = round(G * G / N, 2)
-  SST = round(RSS - CF, 2)
-  SStr = round(S - CF, 2)
-  SSe = round(SST - SStr, 2)
-  
-  F = round((SStr / (n - 1)) / (SSe / (N - n)), 3)
-  data = {
-      "Source of Variation": ["Treatments", "Error", "Total"],
-      'Sum of Squares': [SStr, SSe, SST],
-      'DOF': [n - 1, N - n, N - 1],
-      'Mean Sum of Squares': [round(SStr / (n - 1), 2), round(SSe / (N - n), 2), "-"],
-      'Variance Ratio': ["-", F, "-"]
-  }
-  df = pd.DataFrame(data)
-  df = df.to_string(index=False)
-  print(df)
-  
-  if (F > 1):
-      Ftab = round(se.f.ppf(q=1 - alpha, dfn=n - 1, dfd=N - n), 2)
-  else:
-      F = round(1 / F, 2)
-      Ftab = round(se.f.ppf(q=1 - alpha, dfn=N - n, dfd=n - 1), 2)
-  
-  print("F calculated value =", F, "\nF table value =", Ftab)
-  if (F < Ftab):
-      print("Since Fcal.<Ftable value, We accept H₀.")
-  else:
-      print("Since Fcal.>Ftable value, We reject H₀.")
+G_m={
+     'arad':366,'Bucharest':0,'Craiova':160,
+     'Drobeta':242,'Eforie':161,'Fagaras':176,
+     'Giurgiu':77,'Hirsova':151,'Iasi':226,
+     'Lugoj':244,'Neamt':234,'Oradea':380,
+     'Pitesti':100,'Rimnicu Vilcea':193,'Sibiu':253,
+     'Timisoara':329,'Urziceni':80,'Vaslui':199,
+     'Zerind':374,'mehadia':241
+    }
+A_m={
+     'arad'          :[['Zerind',75],        ['Timisoara',118],     ['Sibiu',140]],
+     'Bucharest'     :[['Pitesti',101],      ['Fagaras',211]],  
+     'Craiova'       :[['Pitesti',138],      ['Rimnicu Vilcea',146],['Drobeta',120]],
+     'Drobeta'       :[['Craiova',120],      ['mehadia',75]],
+     'Fagaras'       :[['Bucharest',211],    ['Sibiu',99]],
+     'Lugoj'         :[['mehadia',70],       ['Timisoara',111]],
+     'Oradea'        :[['Zerind',71],        ['Sibiu',151]],
+     'Pitesti'       :[['Rimnicu Vilcea',97],['Bucharest',101]],
+     'Rimnicu Vilcea':[['Pitesti',97],       ['Sibiu',80],          ['Craiova',146]],
+     'Sibiu'         :[['arad',140],         ['Fagaras',99],        ['Oradea',151]],
+     'Timisoara'     :[['arad',118],         ['Lugoj',111]],
+     'Zerind'        :[['arad',75],          ['Oradea',71]],
+     'mehadia'       :[['Lugoj',70],         ['Drobeta',75]],
+     'Neamt'         :[['Iasi',87]],
+     'Iasi'          :[['Neamt',87],         ['Vaslui',92]],
+     'Vaslui'        :[['Urziceni',142]],
+     'Urziceni'      :[['Vaslui',142],       ['Hirsova',98],        ['Bucharest',85]],
+     'Hirsova'       :[['Urziceni',98],      ['Eforie',86]],
+     'Eforie'        :[['Hirsova',86]]
+    }
+def find_next(ps):
+    k=A_m[ps]
+    m=G_m[k[0][0]]
+    ns=0
+    for i in range(1,len(k)):
+        if(G_m[k[i][0]]<m):
+            m=G_m[k[i][0]]
+            ns=i
+    return ns
+def find_path():
+    i_s=input("enter :")
+    print("initial state:",i_s)
+    path=[]
+    cost=0
+    path.append(i_s)
+    j=find_next(i_s)
+    k=A_m[i_s]
+    cost=cost+k[j][1]
+    path.append(k[j][0])
+    n=len(path)
+    i_s = k[j][0]
+    while(path[n-1]!= 'Bucharest' ):
+            j=find_next(i_s)
+            k=A_m[i_s]
+            cost=cost+k[j][1]
+            i_s = k[j][0]
+            path.append(k[j][0])
+            n=len(path)
+    print(path)
+    print("cost :",cost)
+find_path()
+
       `
     },
     {
-      question: "Aim: To implement Python Program to calculate Multi-Linear Regression Model.",
+      question: "Aim: A* ",
       code: `
-  import numpy as np
-  import pandas as pd
-  import scipy.stats as se
-  
-  alpha = float(input("Enter Level of Significance: "))
-  y = np.array(list(map(int, input("Enter Dependent Variable Values(Y): ").split())))
-  n = int(input("Enter num. of Independent Variables: "))
-  N = len(y)
-  x = []
-  temp = []
-  t = [1] * len(y)
-  x.append(t)
-  
-  for i in range(n):
-      u = list(map(int, input("Enter Independent Variables Values(X values): ").split()))
-      x.append(u)
-      temp.append(u)
-  
-  temp = np.array(temp)
-  x = np.array(x)
-  x = np.transpose(x)
-  y = np.transpose(y)
-  beta = np.dot(np.linalg.inv(np.dot(np.transpose(x), x)), np.dot(np.transpose(x), y))
-  
-  print("Y = ", end="", sep="")
-  for i in range(len(beta)):
-      if (i == len(beta) - 1):
-          print(round(beta[i], 4), "X", i, end="\n", sep="")
-      else:
-          print(round(beta[i], 4), "X", i, " + ", end="", sep="")
-  
-  ycap = []
-  for i in range(len(y)):
-      ycap.append(beta[0] + temp[0][i] * beta[1] + temp[1][i] * beta[2])
-  
-  sigma = y - ycap
-  SSe = SST = 0
-  
-  for i in range(len(sigma)):
-      SSe += round(sigma[i] * sigma[i], 2)
-      SST += round((y[i] - np.mean(y)) ** 2, 2)
-  SSr = SST - SSe
-  R2 = round(SSr / SST, 2)
-  
-  print("R² value is:", R2)
-  if (R2 > 0.9):
-      print("The Model is a Good Fit.")
-  else:
-      print("The Model is Not a Good Fit.")
-  
-  n = n + 1
-  F = round((SSr / (n - 1)) / (SSe / (N - n)), 3)
-  data = {
-      "Source of Variation": ["Regression", "Error", "Total"],
-      'Sum of Squares': [SSr, SSe, SST],
-      'DOF': [n - 1, N - n, N - 1],
-      'Mean Sum of Squares': [round(SSr / (n - 1), 2), round(SSe / (N - n), 2), "-"],
-      'Variance Ratio': ["-", F, "-"]
-  }
-  df = pd.DataFrame(data).to_string(index=False)
-  print(df)
-  
-  if (F > 1):
-      Ftab = round(se.f.ppf(q=1 - alpha, dfn=n - 1, dfd=N - n), 2)
-  else:
-      F = round(1 / F, 2)
-      Ftab = round(se.f.ppf(q=1 - alpha, dfn=N - n, dfd=n - 1), 2)
-  
-  print("F calculated value =", F, "\nF table value =", Ftab)
-  if (F < Ftab):
-      print("Since Fcal.<Ftable value, We accept H₀.")
-  else:
-      print("Since Fcal.>Ftable value, We reject H₀.")
+  G_m={'arad':366,'Bucharest':0,'Craiova':160,
+     'Drobeta':242,'Eforie':161,'Fagaras':176,
+     'Giurgiu':77,'Hirsova':151,'Iasi':226,
+     'Lugoj':244,'Neamt':234,'Oradea':380,
+     'Pitesti':100,'Rimnicu Vilcea':193,'Sibiu':253,
+     'Timisoara':329,'Urziceni':80,'Vaslui':199,
+     'Zerind':374,'mehadia':241
+    }
+A_m={
+     'arad'          :[['Zerind',75],        ['Timisoara',118],     ['Sibiu',140]],
+     'Bucharest'     :[['Pitesti',101],      ['Fagaras',211]],  
+     'Craiova'       :[['Pitesti',138],      ['Rimnicu Vilcea',146],['Drobeta',120]],
+     'Drobeta'       :[['Craiova',120],      ['mehadia',75]],
+     'Fagaras'       :[['Bucharest',211],    ['Sibiu',99]],
+     'Lugoj'         :[['mehadia',70],       ['Timisoara',111]],
+     'Oradea'        :[['Zerind',71],        ['Sibiu',151]],
+     'Pitesti'       :[['Rimnicu Vilcea',97],['Bucharest',101]],
+     'Rimnicu Vilcea':[['Pitesti',97],       ['Sibiu',80],          ['Craiova',146]],
+     'Sibiu'         :[['arad',140],         ['Fagaras',99],        ['Oradea',151]],
+     'Timisoara'     :[['arad',118],         ['Lugoj',111]],
+     'Zerind'        :[['arad',75],          ['Oradea',71]],
+     'mehadia'       :[['Lugoj',70],         ['Drobeta',75]],
+     'Neamt'         :[['Iasi',87]],
+     'Iasi'          :[['Neamt',87],         ['Vaslui',92]],
+     'Vaslui'        :[['Urziceni',142]],
+     'Urziceni'      :[['Vaslui',142],       ['Hirsova',98],        ['Bucharest',85]],
+     'Hirsova'       :[['Urziceni',98],      ['Eforie',86]],
+     'Eforie'        :[['Hirsova',86]]
+    }
+def find_next(ps,cost):
+    k=A_m[ps]
+    m=G_m[k[0][0]]+cost
+    ns=0
+    for i in range(1,len(k)):
+        if(G_m[k[i][0]]+cost<m):
+            m=G_m[k[i][0]]+cost
+            ns=i
+    return ns
+def find_path():
+    i_s=input("enter :")
+    print("initial state:",i_s)
+    path=[]
+    cost=0
+    path.append(i_s)
+    j=find_next(i_s,cost)
+    k=A_m[i_s]
+    cost=cost+k[j][1]
+    path.append(k[j][0])
+    n=len(path)
+    i_s = k[j][0]
+    while(path[n-1]!= 'Bucharest' ):
+            j=find_next(i_s,cost)
+            k=A_m[i_s]
+            cost=cost+k[j][1]
+            i_s = k[j][0]
+            path.append(k[j][0])
+            n=len(path)
+    print(path)
+    print("cost :",cost)
+find_path()
+
       `
     },
     {
