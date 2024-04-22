@@ -1,61 +1,107 @@
 // Array of objects containing questions and their corresponding source codes
 const questions = [
     {
-      question: "Aim: To fit a parabola for the given data",
+      question: "Aim:water jug",
       code: `
-  import numpy as np
-  import matplotlib.pyplot as plt
-  from sympy import symbols, Eq, solve
-  
-  a, b, c = symbols('a, b, c')
-  x = np.array([int(i) for i in input("Enter the x data: ").split()])
-  y = np.array([int(i) for i in input("Enter the y data: ").split()])
-  n = len(x)
-  sx = np.sum(x)
-  sy = np.sum(y)
-  sx2 = np.sum(x * x)
-  sxy = np.sum(x * y)
-  sx3 = np.sum(x * x * x)
-  sx4 = np.sum(x ** 4)
-  sx2y = np.sum(x * x * y)
-  
-  eq1 = Eq((n * a + sx * b + sx2 * c), sy)
-  eq2 = Eq((a * sx + sx2 * b + sx3 * c), sxy)
-  eq3 = Eq((a * sx2 + sx3 * b + sx4 * c), sx2y)
-  
-  d = solve((eq1, eq2, eq3), (a, b, c))
-  
-  print("The equation of parabola is y = {} + {}X + {}X²".format(d[a], d[b], d[c]))
-  plt.scatter(x, y)
-  plt.show()
-      `
+  import random
+e={}
+l=[0,1]
+c=0
+loc=['a','b']
+e.update({'a':random.choice(l)})
+e.update({'b':random.choice(l)})
+i=random.choice(loc)
+print(e)
+print("vacum is at location",i)
+if(i=='a'):
+    if(e.get('a')==0):
+        print("A is clean")
+        print("Move to B")
+    else:
+        print("A is Dirty")
+        e.update({'a':0})
+        c=c+1
+        print("A is clean")
+        print("Move to B")
+    if(e.get('b')==0):
+            print("B is Clean")
+    else:
+        print("B is dirty")
+        e.update({'b':0})
+        c=c+1
+        print("B is clean")
+else:
+    if(e.get('b')==0):
+            print("B is Clean")
+            print("Move to A")
+    else:
+        print("B is dirty")
+        e.update({'b':0})
+        c=c+1
+        print("B is Clean")
+        print("Move to A")
+    if(e.get('a')==0):
+        print("A is clean")
+    else:
+        print("A is dirty")
+        e.update({'a':0})
+        c=c+1
+        print("A is clean")
+print("environment is clean")
+print(e)
+print("performance measure:",c)
+	`
     },
     {
-      question: "Aim: To find the correlation coefficient for the given data",
+      question: "Aim: vacum cleaner",
       code: `
-  import pandas as pd
-  import numpy as np
-  import matplotlib.pyplot as plt
-  
-  x = list(map(float, input("Enter x values: ").split(" ")))
-  y = list(map(float, input("Enter y values: ").split(" ")))
-  x = np.array(x)
-  y = np.array(y)
-  n = len(x)
-  xbar = sum(x) / n
-  ybar = sum(y) / n
-  xy = sum(x * y)
-  cov = round(xy / n - xbar * ybar, 4)
-  sigmax = round((sum(x ** 2) / n - xbar ** 2) ** 0.5, 4)
-  sigmay = round((sum(y ** 2) / n - ybar ** 2) ** 0.5, 4)
-  r = cov / (sigmax * sigmay)
-  
-  d = {"X": x, "Y": y, "XY": x * y, "X²": x * x, "Y²": y * y}
-  df = pd.DataFrame(d)
-  df2 = df.to_string(index=False)
-  
-  print(df2)
-  print("Correlation Coefficient =", round(r, 4))
+ import random
+e={}
+l=[0,1]
+c=0
+loc=['a','b']
+e.update({'a':random.choice(l)})
+e.update({'b':random.choice(l)})
+i=random.choice(loc)
+print(e)
+print("vacum is at location",i)
+if(i=='a'):
+    if(e.get('a')==0):
+        print("A is clean")
+        print("Move to B")
+    else:
+        print("A is Dirty")
+        e.update({'a':0})
+        c=c+1
+        print("A is clean")
+        print("Move to B")
+    if(e.get('b')==0):
+            print("B is Clean")
+    else:
+        print("B is dirty")
+        e.update({'b':0})
+        c=c+1
+        print("B is clean")
+else:
+    if(e.get('b')==0):
+            print("B is Clean")
+            print("Move to A")
+    else:
+        print("B is dirty")
+        e.update({'b':0})
+        c=c+1
+        print("B is Clean")
+        print("Move to A")
+    if(e.get('a')==0):
+        print("A is clean")
+    else:
+        print("A is dirty")
+        e.update({'a':0})
+        c=c+1
+        print("A is clean")
+print("environment is clean")
+print(e)
+print("performance measure:",c)
       `
     },
     {
