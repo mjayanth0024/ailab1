@@ -322,116 +322,150 @@ find_path()
       `
     },
     {
-      question: "Aim: To implement Python Program to calculate Multi Variate Linear Regression.",
+      question: "Aim:PREDICATE LOGIC.",
       code: `
-  import numpy as np
-  
-  y = []
-  x = []
-  n1 = int(input("Enter num. of Dependent Variables(Y's): "))
-  n2 = int(input("Enter num. of Independent Variables(X's): "))
-  
-  for i in range(n1):
-      y.append(list(map(float, input("Y{}: ".format(i + 1)).split())))
-  
-  x.append([1] * len(y[0]))
-  
-  for i in range(n2):
-      x.append(list(map(float, input("X{}: ".format(i + 1)).split())))
-  
-  x = np.array(x)
-  x = np.transpose(x)
-  y = np.array(y)
-  y = np.transpose(y)
-  
-  beta = np.dot(np.linalg.inv(np.dot(np.transpose(x), x)), np.dot(np.transpose(x), y))
-  beta = np.round(beta, decimals=2)
-  shape = beta.shape
-  
-  y1_expression = "Y1 = "
-  y2_expression = "Y2 = "
-  
-  for i in range(shape[0]):
-      y1_expression += " {}X{} + ".format(beta[i][0], i + 1)
-      y2_expression += " {}X{} + ".format(beta[i][1], i + 1)
-  
-  print(y1_expression)
-  print(y2_expression)
+  %facts
+man(marcus).
+pompeian(marcus).
+ruler(caesar).
+loyalto(x,y).
+trytoassasinate(marcus,caesar).
+%rules
+hate(X,caesar):-
+not/ loyalto(X,caesar).
+people(X):-
+	man(X).
+	roman(X):-
+pompeian(X).
+	roman(X):-
+	loyalto(X,caesar);
+	hate(X,caesar).
+not/ loyalto(X,Y):-
+	people(X),
+	ruler(Y),
+	trytoassasinate(X,Y)
       `
     },
     {
-    question: "Aim: Two way anova.",
+    question: "Aim:Map Coloring",
       code: `
-      import pandas as pd
-import scipy.stats as se
-h=int(input("Enter no. of Blocks: "))
-k=int(input("Enter no. of Treatments: "))
-t=[]
-for i in range(k):
-	t.append(list(map(int,input("Enter treatment(s): ").split())))
-Ti=Bj=G=RSS=N=0
-alpha=float(input("Enter Level of Significance: "))
-for i in t:
-	Ti+=sum(i)*sum(i)
-	G+=sum(i)
-for i in range(len(t[0])):
-	position_sum = sum(sublist[i] for sublist in t)
-	Bj += position_sum ** 2
-print("G =",G)
-print("ΣTᵢ² =",Ti)
-print("ΣBⱼ² =",Bj)
-for i in t:
-for j in i:
-RSS+=j*j
-N+=1
-CF=round(G*G/N,2)
-SST=round(RSS-CF,2)
-SStr=round(Ti/h-CF,2)
-SSb=round(Bj/k-CF,2)
-SSe=round(SST-SStr-SSb,2)
-print("1. RSS =",RSS)
-print("2. CF =",CF)
-print("3. SST =",SST)
-print("4. SStr =",SStr)
-print("4. SSb =",SSb)
-print("6. SSe =",SSe)
-Ftr=round((SStr/(k-1))/(SSe/((k-1)*(h-1))),3)
-Fb=round((SSb/(h-1))/(SSe/((k-1)*(h-1))),3)
-data={
-"Source of Variation":["Treatments","Blocks","Error","Total"],
-'Sum of Squares': [SStr,SSb,SSe,SST],
-'DOF': [k-1,h-1,(h-1)*(k-1),k*h-1],
-'Mean Sum of Squares' :[round(SStr/(k-1),2),round(SSb/(h-1),2),round(SSe/((k-1)*(h-1)),2),"-
-"],
-'Variance Ratio' :["-",Ftr,Fb,"-"]
-}
-df=pd.DataFrame(data)
-df=df.to_string(index=False)
-print(df)
-if(Ftr>1):
-	Ftabtr=round(se.f.ppf(q=1-alpha,dfn=k-1,dfd=(k-1)*(h-1)),2)
+ n = 7
+m = 3
+variables = ["Alaska", "Maldives", "Central City", "Mystic Falls", "New Orleans", "Small Ville", "London"]
+g = [
+    [0, 1, 1, 0, 0, 0, 0],
+    [1, 0, 1, 1, 0, 0, 0],
+    [1, 1, 0, 1, 1, 1, 0],
+    [0, 1, 1, 0, 1, 0, 0],
+    [0, 0, 1, 1, 0, 1, 0],
+    [0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+]
+colors = ["Red", "Green", "Blue"]
+
+def isSafe(curr, color, adj):
+    for i in range(n):
+        if g[curr][i] == 1 and color[i] == adj:
+            return False
+    return True
+
+def graphColor(curr, n, color):
+    if curr == n:
+        return True
+    for i in range(1, m + 1):
+        if isSafe(curr, color, i):
+            color[curr] = i
+            if graphColor(curr + 1, n, color):
+                return True
+            color[curr] = 0
+
+color = [0] * n
+if graphColor(0, n, color):
+    c = 0
+    for j in color:
+        print(variables[c] + ": " + colors[j - 1])
+        c += 1
 else:
-	Ftr=round(1/Ftr,3)
-	Ftabtr=round(se.f.ppf(q=1-alpha,dfn=(k-1)*(h-1),dfd=k-1),2)
-print("\n---Inference related to Treatments---")
-print("F calculated value =",Ftr,"\nF table value =",Ftabtr)
-if(Ftr<Ftabtr):
-	print("Since Fcal.<Ftable value, We accept H₀(tr).")
-else:
-	print("Since Fcal.>Ftable value, We reject H₀(tr).")
-if(Fb>1):
-	Ftabb=round(se.f.ppf(q=1-alpha,dfn=h-1,dfd=(k-1)*(h-1)),2)
-else:
-	Ftr=round(1/Fb,3)
-	Ftabb=round(se.f.ppf(q=1-alpha,dfn=(k-1)*(h-1),dfd=h-1),2)
-print("\n---Inference related to Blocks---")
-print("F calculated value =",Fb,"\nF table value =",Ftabb)
-if(Fb<Ftabb):
-	print("Since Fcal.<Ftable value, We accept H₀(b).")
-else:
-	print("Since Fcal.>Ftable value, We reject H₀(b).")
+    print("No possibility to color")
+
       `
     },
+	  {
+    question: "Aim:8 puzzle dfs",
+      code: `
+# Class to represent the state of the puzzle
+class PuzzleState:
+    def __init__(self, puzzle, moves=0):
+        self.puzzle = puzzle
+        self.moves = moves
+
+    def __eq__(self, other):
+        return self.puzzle == other.puzzle
+
+    def __hash__(self):
+        return hash(str(self.puzzle))
+
+    def __str__(self):
+        return '\n'.join([' '.join(map(str, row)) for row in self.puzzle])
+
+    def get_blank_position(self):
+        for i in range(3):
+            for j in range(3):
+                if self.puzzle[i][j] == 0:
+                    return i, j
+
+    def get_neighbors(self):
+        moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Possible movements: right, down, left, up
+        i, j = self.get_blank_position()
+        neighbors = []
+        for move in moves:
+            new_i, new_j = i + move[0], j + move[1]
+            if 0 <= new_i < 3 and 0 <= new_j < 3:
+                new_puzzle = [row[:] for row in self.puzzle]
+                new_puzzle[i][j], new_puzzle[new_i][new_j] = new_puzzle[new_i][new_j], new_puzzle[i][j]
+                neighbors.append(PuzzleState(new_puzzle, self.moves + 1))
+        return neighbors
+
+# Depth-First Search
+def dfs(initial_state, goal_state):
+    visited = set()
+    stack = [initial_state]
+
+    while stack:
+        current_state = stack.pop()
+        if current_state == goal_state:
+            return current_state.moves, current_state
+
+        visited.add(current_state)
+        for neighbor in current_state.get_neighbors()[::-1]:  # Reverse the order for DFS
+            if neighbor not in visited:
+                stack.append(neighbor)
+
+    return float('inf'), None
+
+# Your initial and goal puzzles
+initial_puzzle = [
+    [1, 2, 3],
+    [8, 0, 4],
+    [7, 6, 5]
+]
+goal_puzzle = [
+    [2, 8, 3],
+    [1, 6, 4],
+    [7, 0, 5]
+]
+
+initial_state = PuzzleState(initial_puzzle)
+goal_state = PuzzleState(goal_puzzle)
+moves, solution_state = dfs(initial_state, goal_state)
+
+if solution_state:
+    print("Solution found in {} moves:".format(moves))
+    print(solution_state)
+else:
+    print("No solution found.")
+      `
+},
     // Add more questions and source codes as needed
   ];
   
